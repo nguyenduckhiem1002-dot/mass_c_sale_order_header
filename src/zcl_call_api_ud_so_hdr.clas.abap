@@ -6,7 +6,7 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
     TYPES CustomerGroup TYPE c LENGTH 2.
     TYPES LcNumber TYPE string.
     TYPES LcOpenDate TYPE d.
-    TYPES CommissionRate TYPE decfloat34.
+    TYPES CommissionRate TYPE string.
     TYPES ExportTrustContract TYPE string.
     TYPES HasCustomerGroup TYPE abap_boolean.
     TYPES HasLcNumber TYPE abap_boolean.

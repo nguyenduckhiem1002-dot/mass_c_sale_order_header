@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<abapGit version="1.0.0" serializer="ZABAP2XLSX" serializer-version="0.1.0">
-  <repo xmlns="https://github.com/abapGit/abapGit">
-    <name>mass_c_sale_order_header</name>
-    <label>Mass Change Sales Order Header</label>
-    <branch main="main" />
-  </repo>
-</abapGit>
+<asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+ <asx:values><DATA>
+  <MASTER_LANGUAGE>E</MASTER_LANGUAGE>
+  <STARTING_FOLDER>/src/</STARTING_FOLDER>
+  <FOLDER_LOGIC>FULL</FOLDER_LOGIC>
+  <IGNORE><item>/.gitignore</item><item>/README.md</item><item>/abaplint.json</item></IGNORE>
+ </DATA></asx:values>
+</asx:abap>

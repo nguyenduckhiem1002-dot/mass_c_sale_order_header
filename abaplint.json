@@ -1,0 +1,15 @@
+{
+  "global": {
+    "files": "/src/**/*.*"
+  },
+  "syntax": {
+    "version": "Cloud",
+    "errorNamespace": "^(Z|Y|LCL_|LSC_)"
+  },
+  "rules": {
+    "parser_error": true,
+    "syntax": true,
+    "unknown_types": false,
+    "check_syntax": false
+  }
+}

@@ -8,8 +8,6 @@ define behavior for ZC_MCH_SO_FILE alias ManageFile
   use update;
   use delete;
   use action uploadExcel;
-  use action downloadFile;
-  use action downloadTemplate;
   use action PostConfirm;
   use action Activate;
   use action Discard;
