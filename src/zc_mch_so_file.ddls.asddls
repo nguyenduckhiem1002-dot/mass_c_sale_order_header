@@ -11,5 +11,5 @@ define projection view entity ZC_MCH_SO_FILE
       CreatedBy,
       CreatedAt,
       LastChangedAt,
-      _Rows
+      _DataFile : redirected to composition child ZC_MCH_SO_HDR
 }

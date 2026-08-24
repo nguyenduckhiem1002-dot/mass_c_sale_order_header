@@ -1,6 +1,6 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Mass Change Sales Order Header'
-define root view entity ZI_MCH_SO_HDR
+define view entity ZI_MCH_SO_HDR
   as select from ztb_mch_so_hdr
 {
   key uuid                   as Uuid,
@@ -22,6 +22,6 @@ define root view entity ZI_MCH_SO_HDR
       created_at              as CreatedAt,
       last_changed_by         as LastChangedBy,
       last_changed_at         as LastChangedAt,
-      association [0..1] to ZI_MCH_SO_FILE as _File
-        on $projection.UuidFile = _File.Uuid
+      association to parent ZI_MCH_SO_FILE as _ManageFile
+        on $projection.UuidFile = _ManageFile.Uuid
 }

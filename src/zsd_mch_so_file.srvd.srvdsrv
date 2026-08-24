@@ -1,0 +1,5 @@
+@EndUserText.label: 'Mass Change Sales Order Header Service'
+define service ZSD_MCH_SO_FILE {
+  expose ZC_MCH_SO_FILE as ManageFile;
+  expose ZC_MCH_SO_HDR as DataFile;
+}

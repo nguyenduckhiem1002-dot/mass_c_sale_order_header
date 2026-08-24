@@ -18,8 +18,9 @@ The percentage column accepts decimal values (`0.015`) and percentage text (`1%`
 One upload is a file root persisted in `ZTB_MCH_SO_FILE`; every Sales Order Header row in that file is persisted in
 `ZTB_MCH_SO_HDR` with the same `UUID_FILE`. The rows are exposed through `ZI_MCH_SO_HDR` / `ZC_MCH_SO_HDR` and are
 processed together as one upload unit, matching the reference repository's file/detail pattern.
-The behavior pool validates the template and schedules the processing job after upload completion.
-The actual Sales Order update is isolated in `ZCL_MCH_SO_HDR_UPDATE`, allowing the released RAP/API implementation
+The behavior pool validates the template and creates all detail rows through `CREATE BY _DataFile`.
+The `PostConfirm` action processes every row in the uploaded file. The actual Sales Order update is isolated in
+`ZCL_CALL_API_UD_SO`, allowing the released RAP/API implementation
 to be substituted without changing the upload model. The file lifecycle follows the existing `zabs_file_crud_poc`
 pattern used by the reference repository.
 
@@ -28,5 +29,13 @@ pattern used by the reference repository.
 - Customer Group: Sales Order header API field `CustomerGroup`.
 - Số LC, Ngày mở LC, Tỷ lệ chi com, Số hợp đồng ủy thác XK: Sales Order header text IDs `Z013`, `Z014`, `Z015`, `Z011`.
 
-The text update adapter must use a released Sales Order API or a Tier-3 wrapper if the target S/4HANA release does not
-release header text maintenance directly.
+The text update adapter uses PATCH/POST upsert semantics with the released Sales Order API or a Tier-3 wrapper if the
+target S/4HANA release does not release header text maintenance directly.
+
+## RAP/OData artifacts
+
+- Root/child interface views: `ZI_MCH_SO_FILE`, `ZI_MCH_SO_HDR`.
+- Root/child projection views: `ZC_MCH_SO_FILE`, `ZC_MCH_SO_HDR`.
+- Static action: `uploadExcel` with parameter `zabs_file_crud_poc`.
+- OData V4 service: `ZSD_MCH_SO_FILE` and binding `ZUI_MCH_SO_FILE`.
+- Application-job class/template for rows marked `J`.

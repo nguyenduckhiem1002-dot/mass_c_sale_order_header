@@ -2,7 +2,7 @@
 @EndUserText.label: 'Mass Change Sales Order Header Upload File'
 define root view entity ZI_MCH_SO_FILE
   as select from ztb_mch_so_file
-  composition [0..*] of ZI_MCH_SO_HDR as _Rows
+  composition [0..*] of ZI_MCH_SO_HDR as _DataFile
 {
   key uuid as Uuid,
       file_name as FileName,
@@ -12,5 +12,5 @@ define root view entity ZI_MCH_SO_FILE
       created_by as CreatedBy,
       created_at as CreatedAt,
       last_changed_at as LastChangedAt,
-      _Rows
+      _DataFile
 }

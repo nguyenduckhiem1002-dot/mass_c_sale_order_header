@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<blueSourceObject xmlns="http://www.sap.com/adt/blueSourceObject">
+  <name>ZTBM_MCH_SO_UP_D</name>
+  <description>Draft table for mass change Sales Order Header file</description>
+  <fields><field name="DRAFTUUID" type="SYSUUID_X16" key="true" /><field name="UUID" type="SYSUUID_X16" key="true" /><field name="%ADMIN" type="SSTRING" /></fields>
+</blueSourceObject>

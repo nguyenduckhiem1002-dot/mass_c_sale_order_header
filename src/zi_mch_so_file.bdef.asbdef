@@ -1,30 +1,46 @@
 managed implementation in class zbp_i_mch_so_file unique;
 strict ( 2 );
+with draft;
 
-define behavior for ZI_MCH_SO_FILE alias File
+define behavior for ZI_MCH_SO_FILE alias ManageFile
 persistent table ztb_mch_so_file
+draft table ztbm_mch_so_up_d
 lock master
+total etag LastChangedAt
 etag master LastChangedAt
+authorization master ( global )
+early numbering
 {
   create;
   update;
   delete;
-  association _Rows { create; }
   field ( readonly ) Uuid, CreatedBy, CreatedAt, LastChangedAt;
-  action process result [1] $self;
+  association _DataFile { with draft; create; }
+  static action uploadExcel parameter zabs_file_crud_poc;
+  static action downloadFile result [1] zabs_file_crud_poc;
+  static action downloadTemplate;
+  action PostConfirm result [1] $self;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+  determination setStatusOpen on modify { create; }
+  validation validateFile on save { create; update; }
   mapping for ztb_mch_so_file corresponding;
 }
 
-define behavior for ZI_MCH_SO_HDR alias Header
+define behavior for ZI_MCH_SO_HDR alias DataFile
 persistent table ztb_mch_so_hdr
-lock dependent by _File
+draft table ztbd_mch_so_up_d
+lock dependent by _ManageFile
+authorization dependent by _ManageFile
 {
   update;
   delete;
-  association _File;
+  association _ManageFile { with draft; }
   field ( readonly ) Uuid, UuidFile, MessageType, Message, CreatedBy, CreatedAt, LastChangedBy, LastChangedAt;
   field ( mandatory ) SalesOrder;
   validation validateRow on save { create; update; field SalesOrder; }
-  action process result [1] $self;
   mapping for ztb_mch_so_hdr corresponding;
 }

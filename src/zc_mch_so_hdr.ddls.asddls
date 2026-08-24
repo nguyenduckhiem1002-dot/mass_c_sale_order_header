@@ -6,5 +6,6 @@ define projection view entity ZC_MCH_SO_HDR
   key Uuid, UuidFile, SalesOrder, CustomerGroup, LcNumber, LcOpenDate,
       CommissionRate, ExportTrustContract, HasCustomerGroup, HasLcNumber,
       HasLcOpenDate, HasCommissionRate, HasExportTrustContract, MessageType,
-      Message, CreatedBy, CreatedAt, LastChangedBy, LastChangedAt
+      Message, CreatedBy, CreatedAt, LastChangedBy, LastChangedAt,
+      _ManageFile : redirected to parent ZC_MCH_SO_FILE
 }
