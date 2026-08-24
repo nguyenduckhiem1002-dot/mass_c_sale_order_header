@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="1.0.0" serializer="ZABAP2XLSX" serializer-version="0.1.0">
+  <repo xmlns="https://github.com/abapGit/abapGit">
+    <name>mass_c_sale_order_header</name>
+    <label>Mass Change Sales Order Header</label>
+    <branch main="main" />
+  </repo>
+</abapGit>

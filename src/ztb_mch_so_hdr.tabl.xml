@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<blueSourceObject xmlns="http://www.sap.com/adt/blueSourceObject">
+  <name>ZTB_MCH_SO_HDR</name>
+  <description>Mass change Sales Order header upload rows</description>
+  <fields>
+    <field name="UUID" type="SYSUUID_X16" key="true" />
+    <field name="UUID_FILE" type="SYSUUID_X16" />
+    <field name="SALES_ORDER" type="CHAR10" />
+    <field name="CUSTOMER_GROUP" type="CHAR2" />
+    <field name="LC_NUMBER" type="CHAR255" />
+    <field name="LC_OPEN_DATE" type="DATS" />
+    <field name="COMMISSION_RATE" type="DEC15_6" />
+    <field name="EXPORT_TRUST_CONTRACT" type="CHAR255" />
+    <field name="HAS_CUSTOMER_GROUP" type="ABAP_BOOLEAN" />
+    <field name="HAS_LC_NUMBER" type="ABAP_BOOLEAN" />
+    <field name="HAS_LC_OPEN_DATE" type="ABAP_BOOLEAN" />
+    <field name="HAS_COMMISSION_RATE" type="ABAP_BOOLEAN" />
+    <field name="HAS_EXPORT_TRUST_CONTRACT" type="ABAP_BOOLEAN" />
+    <field name="MESSAGE_TYPE" type="CHAR1" />
+    <field name="MESSAGE" type="CHAR512" />
+    <field name="CREATED_BY" type="SYUNAME" />
+    <field name="CREATED_AT" type="TIMESTAMPL" />
+    <field name="LAST_CHANGED_BY" type="SYUNAME" />
+    <field name="LAST_CHANGED_AT" type="TIMESTAMPL" />
+  </fields>
+</blueSourceObject>
