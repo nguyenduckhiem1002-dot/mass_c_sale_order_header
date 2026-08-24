@@ -20,6 +20,7 @@ define view entity ZI_MCH_SO_HDR
       has_lc_open_date       as HasLcOpenDate,
       has_commission_rate    as HasCommissionRate,
       has_export_trust_contract as HasExportTrustContract,
+      @ObjectModel.text.element: ['OverallStatusText']
       message_type            as MessageType,
       case message_type
         when 'E' then 1
@@ -27,6 +28,9 @@ define view entity ZI_MCH_SO_HDR
         when 'S' then 3
         else 0
       end                     as Criticality,
+      @EndUserText.label: 'Status'
+      @Semantics.text: true
+      _OverallStatus.description as OverallStatusText,
       message                 as Message,
       @Semantics.user.createdBy: true
       created_by              as CreatedBy,

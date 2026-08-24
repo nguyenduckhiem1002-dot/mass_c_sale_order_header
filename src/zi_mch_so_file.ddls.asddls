@@ -10,6 +10,7 @@ define root view entity ZI_MCH_SO_FILE
       file_name as FileName,
       file_mime_type as FileMimeType,
       attachment as Attachment,
+      @ObjectModel.text.element: ['OverallStatusText']
       status as Status,
       case status
         when 'E' then 1
@@ -20,6 +21,9 @@ define root view entity ZI_MCH_SO_FILE
         when 'S' then 3
         else 0
       end as Criticality,
+      @EndUserText.label: 'Status'
+      @Semantics.text: true
+      _OverallStatus.description as OverallStatusText,
       message as Message,
       @Semantics.user.createdBy: true
       created_by as CreatedBy,
