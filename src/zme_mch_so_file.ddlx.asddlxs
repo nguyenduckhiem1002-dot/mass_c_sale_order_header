@@ -1,0 +1,66 @@
+@Metadata.layer: #CORE
+@UI.headerInfo: {
+  typeName: 'Sales Order Header Upload',
+  typeNamePlural: 'Sales Order Header Uploads',
+  title: { value: 'FileName' }
+}
+@UI.presentationVariant: [{
+  sortOrder: [{ by: 'CreatedAt', direction: #DESC }],
+  visualizations: [{ type: #AS_LINEITEM }]
+}]
+@UI.lineItem: [
+  { type: #FOR_ACTION, dataAction: 'uploadExcel', label: 'Upload Excel' },
+  { type: #FOR_ACTION, dataAction: 'PostConfirm', label: 'Process File', invocationGrouping: #CHANGE_SET }
+]
+annotate entity ZC_MCH_SO_FILE with
+{
+  @UI.facet: [
+    { id: 'General', type: #COLLECTION, label: 'General', position: 10 },
+    { id: 'BasicInfo', parentId: 'General', type: #FIELDGROUP_REFERENCE,
+      targetQualifier: 'BasicInfo', label: 'Upload Information', position: 10 },
+    { id: 'HeaderRows', type: #LINEITEM_REFERENCE, targetElement: '_DataFile',
+      label: 'Sales Order Headers', position: 20 }
+  ]
+  @UI.hidden: true
+  Uuid;
+
+  @UI.selectionField: [{ position: 10 }]
+  @UI.lineItem: [{ position: 10 }]
+  @UI.identification: [{ position: 10 }]
+  @UI.fieldGroup: [{ qualifier: 'BasicInfo', position: 10 }]
+  @EndUserText.label: 'File Name'
+  FileName;
+
+  @UI.hidden: true
+  FileMimeType;
+
+  @UI.hidden: true
+  Attachment;
+
+  @UI.selectionField: [{ position: 20 }]
+  @UI.lineItem: [{ position: 20 }]
+  @UI.identification: [{ position: 20 }]
+  @UI.fieldGroup: [{ qualifier: 'BasicInfo', position: 20 }]
+  @EndUserText.label: 'Status'
+  Status;
+
+  @UI.lineItem: [{ position: 30 }]
+  @UI.identification: [{ position: 30 }]
+  @UI.fieldGroup: [{ qualifier: 'BasicInfo', position: 30 }]
+  Message;
+
+  @UI.selectionField: [{ position: 40 }]
+  @UI.lineItem: [{ position: 40 }]
+  @UI.identification: [{ position: 40 }]
+  @UI.fieldGroup: [{ qualifier: 'BasicInfo', position: 40 }]
+  CreatedBy;
+
+  @UI.selectionField: [{ position: 50 }]
+  @UI.lineItem: [{ position: 50 }]
+  @UI.identification: [{ position: 50 }]
+  @UI.fieldGroup: [{ qualifier: 'BasicInfo', position: 50 }]
+  CreatedAt;
+
+  @UI.hidden: true
+  LastChangedAt;
+}
