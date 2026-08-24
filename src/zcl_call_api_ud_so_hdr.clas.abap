@@ -2,6 +2,7 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
   PUBLIC SECTION.
     TYPES BEGIN OF ty_header.
     TYPES Uuid TYPE sysuuid_x16.
+    TYPES UuidFile TYPE sysuuid_x16.
     TYPES SalesOrder TYPE c LENGTH 10.
     TYPES CustomerGroup TYPE c LENGTH 2.
     TYPES LcNumber TYPE string.

@@ -1,0 +1,99 @@
+@Metadata.layer: #CORE
+@UI.headerInfo: {
+  typeName: 'Sales Order Header Change',
+  typeNamePlural: 'Sales Order Header Changes',
+  title: { value: 'SalesOrder' }
+}
+@UI.lineItem: [{ criticality: 'Criticality' }]
+annotate entity ZC_MCH_SO_HDR with
+{
+  @UI.facet: [
+    { id: 'General', type: #COLLECTION, label: 'General', position: 10 },
+    { id: 'ChangeData', parentId: 'General', type: #FIELDGROUP_REFERENCE,
+      targetQualifier: 'ChangeData', label: 'Header Changes', position: 10 },
+    { id: 'Result', parentId: 'General', type: #FIELDGROUP_REFERENCE,
+      targetQualifier: 'Result', label: 'Processing Result', position: 20 }
+  ]
+  @UI.hidden: true
+  Uuid;
+
+  @UI.hidden: true
+  UuidFile;
+
+  @UI.selectionField: [{ position: 10 }]
+  @UI.lineItem: [{ position: 10, importance: #HIGH }]
+  @UI.identification: [{ position: 10 }]
+  @UI.fieldGroup: [{ qualifier: 'ChangeData', position: 10 }]
+  @EndUserText.label: 'Sales Order'
+  SalesOrder;
+
+  @UI.selectionField: [{ position: 20 }]
+  @UI.lineItem: [{ position: 20 }]
+  @UI.identification: [{ position: 20 }]
+  @UI.fieldGroup: [{ qualifier: 'ChangeData', position: 20 }]
+  @EndUserText.label: 'Customer Group'
+  CustomerGroup;
+
+  @UI.lineItem: [{ position: 30 }]
+  @UI.identification: [{ position: 30 }]
+  @UI.fieldGroup: [{ qualifier: 'ChangeData', position: 30 }]
+  @EndUserText.label: 'Số LC (Z013)'
+  LcNumber;
+
+  @UI.lineItem: [{ position: 40 }]
+  @UI.identification: [{ position: 40 }]
+  @UI.fieldGroup: [{ qualifier: 'ChangeData', position: 40 }]
+  @EndUserText.label: 'Ngày mở LC (Z014)'
+  LcOpenDate;
+
+  @UI.lineItem: [{ position: 50 }]
+  @UI.identification: [{ position: 50 }]
+  @UI.fieldGroup: [{ qualifier: 'ChangeData', position: 50 }]
+  @EndUserText.label: 'Tỷ lệ chi com (Z015)'
+  CommissionRate;
+
+  @UI.lineItem: [{ position: 60 }]
+  @UI.identification: [{ position: 60 }]
+  @UI.fieldGroup: [{ qualifier: 'ChangeData', position: 60 }]
+  @EndUserText.label: 'Số hợp đồng ủy thác XK (Z011)'
+  ExportTrustContract;
+
+  @UI.hidden: true
+  HasCustomerGroup;
+  @UI.hidden: true
+  HasLcNumber;
+  @UI.hidden: true
+  HasLcOpenDate;
+  @UI.hidden: true
+  HasCommissionRate;
+  @UI.hidden: true
+  HasExportTrustContract;
+
+  @UI.lineItem: [{ position: 70, importance: #HIGH, criticality: 'Criticality' }]
+  @UI.identification: [{ position: 70 }]
+  @UI.fieldGroup: [{ qualifier: 'Result', position: 10 }]
+  @EndUserText.label: 'Result Type'
+  @UI.dataPoint: { title: 'Result Type', criticality: 'Criticality' }
+  MessageType;
+
+  @Consumption.filter.hidden: true
+  Criticality;
+
+  @UI.hidden: true
+  OverallStatusText;
+
+  @UI.lineItem: [{ position: 80, importance: #HIGH }]
+  @UI.identification: [{ position: 80 }]
+  @UI.fieldGroup: [{ qualifier: 'Result', position: 20 }]
+  @EndUserText.label: 'Result Message'
+  Message;
+
+  @UI.hidden: true
+  CreatedBy;
+  @UI.hidden: true
+  CreatedAt;
+  @UI.hidden: true
+  LastChangedBy;
+  @UI.hidden: true
+  LastChangedAt;
+}
