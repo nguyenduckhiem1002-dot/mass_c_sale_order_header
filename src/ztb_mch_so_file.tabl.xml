@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<blueSourceObject xmlns="http://www.sap.com/adt/blueSourceObject">
+  <name>ZTB_MCH_SO_FILE</name>
+  <description>Mass change Sales Order Header upload file</description>
+  <fields>
+    <field name="UUID" type="SYSUUID_X16" key="true" />
+    <field name="FILE_NAME" type="CHAR255" />
+    <field name="FILE_MIME_TYPE" type="CHAR128" />
+    <field name="STATUS" type="CHAR1" />
+    <field name="MESSAGE" type="CHAR512" />
+    <field name="CREATED_BY" type="SYUNAME" />
+    <field name="CREATED_AT" type="TIMESTAMPL" />
+    <field name="LAST_CHANGED_AT" type="TIMESTAMPL" />
+  </fields>
+</blueSourceObject>

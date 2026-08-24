@@ -21,5 +21,7 @@ define root view entity ZI_MCH_SO_HDR
       created_by              as CreatedBy,
       created_at              as CreatedAt,
       last_changed_by         as LastChangedBy,
-      last_changed_at         as LastChangedAt
+      last_changed_at         as LastChangedAt,
+      association [0..1] to ZI_MCH_SO_FILE as _File
+        on $projection.UuidFile = _File.Uuid
 }
