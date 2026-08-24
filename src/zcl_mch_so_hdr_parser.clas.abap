@@ -14,7 +14,8 @@ CLASS zcl_mch_so_hdr_parser DEFINITION PUBLIC FINAL CREATE PUBLIC.
     TYPES has_commission_rate TYPE abap_boolean.
     TYPES has_export_trust_contract TYPE abap_boolean.
     TYPES END OF ty_row.
-    CLASS-METHODS parse IMPORTING iv_content TYPE xstring RETURNING VALUE(rt_rows) TYPE STANDARD TABLE OF ty_row
+    TYPES tt_row TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.
+    CLASS-METHODS parse IMPORTING iv_content TYPE xstring RETURNING VALUE(rt_rows) TYPE tt_row
       RAISING zcx_mch_so_hdr.
   PRIVATE SECTION.
     CONSTANTS c_header_rows TYPE i VALUE 3.
@@ -44,7 +45,9 @@ CLASS zcl_mch_so_hdr_parser IMPLEMENTATION.
         RAISE EXCEPTION TYPE zcx_mch_so_hdr EXPORTING text = |Cannot read Excel: { error->get_text( ) }|.
     ENDTRY.
     DO c_header_rows TIMES.
-      IF inputs IS NOT INITIAL. DELETE inputs INDEX 1. ENDIF.
+      IF inputs IS NOT INITIAL.
+        DELETE inputs INDEX 1.
+      ENDIF.
     ENDDO.
     DATA sales_orders TYPE HASHED TABLE OF string WITH UNIQUE KEY table_line.
     LOOP AT inputs INTO DATA(input).

@@ -15,7 +15,8 @@ CLASS zcl_job_mch_so_header IMPLEMENTATION.
       CHECK rows IS NOT INITIAL.
       DATA api_rows TYPE zcl_call_api_ud_so_hdr=>tt_header.
       LOOP AT rows INTO DATA(row).
-        APPEND VALUE #( Uuid = row-uuid SalesOrder = row-sales_order CustomerGroup = row-customer_group
+        APPEND VALUE #( Uuid = row-uuid UuidFile = row-uuid_file
+          SalesOrder = row-sales_order CustomerGroup = row-customer_group
           LcNumber = row-lc_number LcOpenDate = row-lc_open_date CommissionRate = row-commission_rate
           ExportTrustContract = row-export_trust_contract HasCustomerGroup = row-has_customer_group
           HasLcNumber = row-has_lc_number HasLcOpenDate = row-has_lc_open_date
@@ -27,6 +28,7 @@ CLASS zcl_job_mch_so_header IMPLEMENTATION.
         UPDATE FIELDS ( MessageType Message )
         WITH VALUE #( FOR api_row IN api_rows
           ( Uuid = api_row-Uuid
+            UuidFile = api_row-UuidFile
             MessageType = api_row-MessageType
             Message = api_row-Message ) )
         FAILED DATA(update_failed)

@@ -8,7 +8,7 @@ define view entity ZI_MCH_SO_HDR
     on $projection.UuidFile = _ManageFile.Uuid
 {
   key uuid                   as Uuid,
-      uuid_file              as UuidFile,
+  key uuid_file              as UuidFile,
       sales_order             as SalesOrder,
       customer_group          as CustomerGroup,
       lc_number               as LcNumber,
