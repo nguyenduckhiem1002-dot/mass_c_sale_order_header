@@ -4,6 +4,7 @@
   typeNamePlural: 'Sales Order Header Changes',
   title: { value: 'SalesOrder' }
 }
+@UI.lineItem: [{ criticality: 'Criticality' }]
 annotate entity ZC_MCH_SO_HDR with
 {
   @UI.facet: [
@@ -68,11 +69,18 @@ annotate entity ZC_MCH_SO_HDR with
   @UI.hidden: true
   HasExportTrustContract;
 
-  @UI.lineItem: [{ position: 70, importance: #HIGH }]
+  @UI.lineItem: [{ position: 70, importance: #HIGH, criticality: 'Criticality' }]
   @UI.identification: [{ position: 70 }]
   @UI.fieldGroup: [{ qualifier: 'Result', position: 10 }]
   @EndUserText.label: 'Result Type'
+  @UI.dataPoint: { title: 'Result Type', criticality: 'Criticality' }
   MessageType;
+
+  @Consumption.filter.hidden: true
+  Criticality;
+
+  @UI.hidden: true
+  OverallStatusText;
 
   @UI.lineItem: [{ position: 80, importance: #HIGH }]
   @UI.identification: [{ position: 80 }]

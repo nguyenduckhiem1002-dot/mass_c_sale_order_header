@@ -2,6 +2,8 @@
 @EndUserText.label: 'Mass Change Sales Order Header Upload File'
 define root view entity ZI_MCH_SO_FILE
   as select from ztb_mch_so_file
+  association [0..1] to zi_req_sta_crud_poc_vh as _OverallStatus
+    on $projection.Status = _OverallStatus.Status
   composition [0..*] of ZI_MCH_SO_HDR as _DataFile
 {
   key uuid as Uuid,
@@ -9,6 +11,15 @@ define root view entity ZI_MCH_SO_FILE
       file_mime_type as FileMimeType,
       attachment as Attachment,
       status as Status,
+      case status
+        when 'E' then 1
+        when 'X' then 1
+        when 'J' then 2
+        when 'P' then 2
+        when 'D' then 3
+        when 'S' then 3
+        else 0
+      end as Criticality,
       message as Message,
       @Semantics.user.createdBy: true
       created_by as CreatedBy,
@@ -17,5 +28,6 @@ define root view entity ZI_MCH_SO_FILE
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
       @Semantics.systemDateTime.lastChangedAt: true
       last_changed_at as LastChangedAt,
-      _DataFile
+      _DataFile,
+      _OverallStatus
 }

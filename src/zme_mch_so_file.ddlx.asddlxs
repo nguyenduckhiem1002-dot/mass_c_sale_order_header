@@ -9,6 +9,7 @@
   visualizations: [{ type: #AS_LINEITEM }]
 }]
 @UI.lineItem: [
+  { criticality: 'Criticality' },
   { type: #FOR_ACTION, dataAction: 'uploadExcel', label: 'Upload Excel' },
   { type: #FOR_ACTION, dataAction: 'PostConfirm', label: 'Process File', invocationGrouping: #CHANGE_SET }
 ]
@@ -38,11 +39,18 @@ annotate entity ZC_MCH_SO_FILE with
   Attachment;
 
   @UI.selectionField: [{ position: 20 }]
-  @UI.lineItem: [{ position: 20 }]
+  @UI.lineItem: [{ position: 20, criticality: 'Criticality' }]
   @UI.identification: [{ position: 20 }]
   @UI.fieldGroup: [{ qualifier: 'BasicInfo', position: 20 }]
   @EndUserText.label: 'Status'
+  @UI.dataPoint: { title: 'Status', criticality: 'Criticality' }
   Status;
+
+  @Consumption.filter.hidden: true
+  Criticality;
+
+  @UI.hidden: true
+  OverallStatusText;
 
   @UI.lineItem: [{ position: 30 }]
   @UI.identification: [{ position: 30 }]
