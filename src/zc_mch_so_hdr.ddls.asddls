@@ -1,5 +1,5 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
-@EndUserText.label: 'Mass Change Sales Order Header - Consumption'
+@EndUserText.label: 'Mass Change SO Header Rows'
 @Metadata.allowExtensions: true
 define projection view entity ZC_MCH_SO_HDR
   as projection on ZI_MCH_SO_HDR

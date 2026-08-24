@@ -1,5 +1,5 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
-@EndUserText.label: 'Mass Change Sales Order Header Upload File'
+@EndUserText.label: 'Mass Change SO Header Upload File'
 define root view entity ZI_MCH_SO_FILE
   as select from ztb_mch_so_file
   association [0..1] to zi_req_sta_crud_poc_vh as _OverallStatus
