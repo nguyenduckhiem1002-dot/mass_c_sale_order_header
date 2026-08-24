@@ -13,7 +13,7 @@ CLASS zcl_job_mch_so_header IMPLEMENTATION.
           AND message_type = 'J'
         INTO TABLE @DATA(rows).
       CHECK rows IS NOT INITIAL.
-      DATA api_rows TYPE zcl_call_api_ud_so=>tt_header.
+      DATA api_rows TYPE zcl_call_api_ud_so_hdr=>tt_header.
       LOOP AT rows INTO DATA(row).
         APPEND VALUE #( Uuid = row-uuid SalesOrder = row-sales_order CustomerGroup = row-customer_group
           LcNumber = row-lc_number LcOpenDate = row-lc_open_date CommissionRate = row-commission_rate
@@ -21,7 +21,7 @@ CLASS zcl_job_mch_so_header IMPLEMENTATION.
           HasLcNumber = row-has_lc_number HasLcOpenDate = row-has_lc_open_date
           HasCommissionRate = row-has_commission_rate HasExportTrustContract = row-has_export_trust_contract ) TO api_rows.
       ENDLOOP.
-      zcl_call_api_ud_so=>update_header( CHANGING ct_data = api_rows ).
+      zcl_call_api_ud_so_hdr=>update_header( CHANGING ct_data = api_rows ).
       LOOP AT api_rows INTO DATA(api_row).
         UPDATE ztb_mch_so_hdr SET message_type = @api_row-MessageType message = @api_row-Message
           WHERE uuid = @api_row-Uuid AND uuid_file = @parameter-low.

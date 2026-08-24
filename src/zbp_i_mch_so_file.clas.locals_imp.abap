@@ -62,7 +62,7 @@ CLASS lhc_managefile IMPLEMENTATION.
     READ ENTITIES OF zi_mch_so_file IN LOCAL MODE
       ENTITY ManageFile BY \_DataFile ALL FIELDS WITH CORRESPONDING #( keys )
       RESULT DATA(rows).
-    DATA api_rows TYPE zcl_call_api_ud_so=>tt_header.
+    DATA api_rows TYPE zcl_call_api_ud_so_hdr=>tt_header.
     LOOP AT rows INTO DATA(row).
       APPEND VALUE #( Uuid = row-Uuid SalesOrder = row-SalesOrder CustomerGroup = row-CustomerGroup
         LcNumber = row-LcNumber LcOpenDate = row-LcOpenDate CommissionRate = row-CommissionRate
@@ -70,7 +70,7 @@ CLASS lhc_managefile IMPLEMENTATION.
         HasLcNumber = row-HasLcNumber HasLcOpenDate = row-HasLcOpenDate
         HasCommissionRate = row-HasCommissionRate HasExportTrustContract = row-HasExportTrustContract ) TO api_rows.
     ENDLOOP.
-    zcl_call_api_ud_so=>update_header( CHANGING ct_data = api_rows ).
+    zcl_call_api_ud_so_hdr=>update_header( CHANGING ct_data = api_rows ).
     LOOP AT api_rows ASSIGNING FIELD-SYMBOL(<api_row>).
       READ TABLE rows ASSIGNING FIELD-SYMBOL(<row>) WITH KEY Uuid = <api_row>-Uuid.
       IF sy-subrc = 0.

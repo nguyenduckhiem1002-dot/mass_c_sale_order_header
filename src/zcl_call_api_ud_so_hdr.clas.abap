@@ -1,4 +1,4 @@
-CLASS zcl_call_api_ud_so DEFINITION PUBLIC FINAL CREATE PUBLIC.
+CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
   PUBLIC SECTION.
     TYPES BEGIN OF ty_header.
     TYPES Uuid TYPE sysuuid_x16.
@@ -32,7 +32,7 @@ CLASS zcl_call_api_ud_so DEFINITION PUBLIC FINAL CREATE PUBLIC.
     CLASS-METHODS escape_json IMPORTING iv_text TYPE string RETURNING VALUE(rv_text) TYPE string.
 ENDCLASS.
 
-CLASS zcl_call_api_ud_so IMPLEMENTATION.
+CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
   METHOD update_header.
     LOOP AT ct_data ASSIGNING FIELD-SYMBOL(<row>).
       DATA errors TYPE string_table.
