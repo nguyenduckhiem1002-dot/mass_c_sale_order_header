@@ -11,7 +11,7 @@ The first worksheet must contain two header rows and data beginning at row 4:
 |  |  | Số LC | Ngày mở LC | Tỷ lệ chi com | Số hợp đồng ủy thác XK |
 
 `SO*` is mandatory. Blank cells mean that the corresponding field is not changed.
-The percentage column accepts decimal values (`0.015`) and percentage text (`1%`).
+The Z015 column is preserved as text because it is written to Sales Order long text and may contain units or notes.
 
 ## Design
 
@@ -19,10 +19,9 @@ One upload is a file root persisted in `ZTB_MCH_SO_FILE`; every Sales Order Head
 `ZTB_MCH_SO_HDR` with the same `UUID_FILE`. The rows are exposed through `ZI_MCH_SO_HDR` / `ZC_MCH_SO_HDR` and are
 processed together as one upload unit, matching the reference repository's file/detail pattern.
 The behavior pool validates the template and creates all detail rows through `CREATE BY _DataFile`.
-The `PostConfirm` action processes every row in the uploaded file. The actual Sales Order update is isolated in
-`ZCL_CALL_API_UD_SO`, allowing the released RAP/API implementation
-to be substituted without changing the upload model. The file lifecycle follows the existing `zabs_file_crud_poc`
-pattern used by the reference repository.
+The `PostConfirm` action marks all rows for background processing. The RAP additional-save implementation schedules
+`ZCL_JOB_MCH_SO_HEADER`, and the Sales Order update is isolated in `ZCL_CALL_API_UD_SO_HDR`. The original attachment
+is persisted on the file root, following the `zabs_file_crud_poc` upload pattern from the reference repository.
 
 ## Required SAP API mapping
 

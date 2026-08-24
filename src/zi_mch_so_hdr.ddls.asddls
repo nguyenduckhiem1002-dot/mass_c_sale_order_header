@@ -2,6 +2,8 @@
 @EndUserText.label: 'Mass Change Sales Order Header'
 define view entity ZI_MCH_SO_HDR
   as select from ztb_mch_so_hdr
+  association to parent ZI_MCH_SO_FILE as _ManageFile
+    on $projection.UuidFile = _ManageFile.Uuid
 {
   key uuid                   as Uuid,
       uuid_file              as UuidFile,
@@ -18,10 +20,14 @@ define view entity ZI_MCH_SO_HDR
       has_export_trust_contract as HasExportTrustContract,
       message_type            as MessageType,
       message                 as Message,
+      @Semantics.user.createdBy: true
       created_by              as CreatedBy,
+      @Semantics.systemDateTime.createdAt: true
       created_at              as CreatedAt,
+      @Semantics.user.localInstanceLastChangedBy: true
       last_changed_by         as LastChangedBy,
+      @Semantics.systemDateTime.localInstanceLastChangedAt: true
+      @Semantics.systemDateTime.lastChangedAt: true
       last_changed_at         as LastChangedAt,
-      association to parent ZI_MCH_SO_FILE as _ManageFile
-        on $projection.UuidFile = _ManageFile.Uuid
+      _ManageFile
 }
