@@ -20,6 +20,23 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
     TYPES tt_header TYPE STANDARD TABLE OF ty_header WITH EMPTY KEY.
     CLASS-METHODS update_header CHANGING ct_data TYPE tt_header.
   PRIVATE SECTION.
+    TYPES BEGIN OF ty_error_message.
+    TYPES value TYPE string.
+    TYPES END OF ty_error_message.
+    TYPES BEGIN OF ty_error_flat_detail.
+    TYPES code TYPE string.
+    TYPES message TYPE string.
+    TYPES END OF ty_error_flat_detail.
+    TYPES BEGIN OF ty_error_flat_response.
+    TYPES error TYPE ty_error_flat_detail.
+    TYPES END OF ty_error_flat_response.
+    TYPES BEGIN OF ty_error_nested_detail.
+    TYPES code TYPE string.
+    TYPES message TYPE ty_error_message.
+    TYPES END OF ty_error_nested_detail.
+    TYPES BEGIN OF ty_error_nested_response.
+    TYPES error TYPE ty_error_nested_detail.
+    TYPES END OF ty_error_nested_response.
     CONSTANTS c_service_root TYPE string VALUE `/sap/opu/odata/sap/API_SALES_ORDER_SRV/`.
     CONSTANTS c_sales_order_v4 TYPE string
       VALUE `/sap/opu/odata4/sap/api_salesorder/srvd_a2x/sap/salesorder/0001/SalesOrder`.
@@ -39,55 +56,55 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
   METHOD update_header.
     LOOP AT ct_data ASSIGNING FIELD-SYMBOL(<row>).
       DATA errors TYPE string_table.
-      IF <row>-has_customer_group = abap_true.
+      IF <row>-hascustomergroup = abap_true.
         update_customer_group( EXPORTING is_data = <row> IMPORTING ev_message = DATA(message)
           RECEIVING rv_ok = DATA(ok) ).
         IF ok = abap_false. APPEND message TO errors. ENDIF.
       ENDIF.
-      IF <row>-has_lc_number = abap_true.
-        update_header_text( EXPORTING is_data = <row> iv_text_id = 'Z013' iv_text = <row>-lc_number
+      IF <row>-haslcnumber = abap_true.
+        update_header_text( EXPORTING is_data = <row> iv_text_id = 'Z013' iv_text = <row>-lcnumber
           IMPORTING ev_message = message RECEIVING rv_ok = ok ).
         IF ok = abap_false. APPEND |Số LC: { message }| TO errors. ENDIF.
       ENDIF.
-      IF <row>-has_lc_open_date = abap_true.
+      IF <row>-haslcopendate = abap_true.
         update_header_text( EXPORTING is_data = <row> iv_text_id = 'Z014'
-          iv_text = |{ <row>-lc_open_date DATE = ISO }| IMPORTING ev_message = message RECEIVING rv_ok = ok ).
+          iv_text = |{ <row>-lcopendate DATE = ISO }| IMPORTING ev_message = message RECEIVING rv_ok = ok ).
         IF ok = abap_false. APPEND |Ngày mở LC: { message }| TO errors. ENDIF.
       ENDIF.
-      IF <row>-has_commission_rate = abap_true.
+      IF <row>-hascommissionrate = abap_true.
         update_header_text( EXPORTING is_data = <row> iv_text_id = 'Z015'
-          iv_text = |{ <row>-commission_rate }| IMPORTING ev_message = message RECEIVING rv_ok = ok ).
+          iv_text = <row>-commissionrate IMPORTING ev_message = message RECEIVING rv_ok = ok ).
         IF ok = abap_false. APPEND |Tỷ lệ chi com: { message }| TO errors. ENDIF.
       ENDIF.
-      IF <row>-has_export_trust_contract = abap_true.
-        update_header_text( EXPORTING is_data = <row> iv_text_id = 'Z011' iv_text = <row>-export_trust_contract
+      IF <row>-hasexporttrustcontract = abap_true.
+        update_header_text( EXPORTING is_data = <row> iv_text_id = 'Z011' iv_text = <row>-exporttrustcontract
           IMPORTING ev_message = message RECEIVING rv_ok = ok ).
         IF ok = abap_false. APPEND |Số hợp đồng ủy thác XK: { message }| TO errors. ENDIF.
       ENDIF.
       IF errors IS INITIAL.
-        <row>-message_type = 'S'. <row>-message = 'Success'.
+        <row>-messagetype = 'S'. <row>-message = 'Success'.
       ELSE.
         DATA(full_message) = concat_lines_of( table = errors sep = '; ' ).
-        <row>-message_type = 'E'.
+        <row>-messagetype = 'E'.
         <row>-message = substring( val = full_message len = nmin( val1 = c_max_message val2 = strlen( full_message ) ) ).
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
   METHOD update_customer_group.
-    DATA(endpoint) = |{ c_sales_order_v4 }('{ is_data-sales_order }')|.
+    DATA(endpoint) = |{ c_sales_order_v4 }('{ is_data-salesorder }')|.
     rv_ok = do_call( EXPORTING iv_endpoint = endpoint iv_method = 'PATCH'
-      iv_body = |\{ "CustomerGroup":"{ escape_json( is_data-customer_group ) }" \}|
+      iv_body = |\{ "CustomerGroup":"{ escape_json( CONV string( is_data-customergroup ) ) }" \}|
       IMPORTING ev_message = ev_message ev_code = DATA(code) ev_response = DATA(response) ).
   ENDMETHOD.
 
   METHOD update_header_text.
-    DATA(endpoint) = |{ c_service_root }A_SalesOrderText(SalesOrder='{ is_data-sales_order }',Language='EN',LongTextID='{ iv_text_id }')|.
+    DATA(endpoint) = |{ c_service_root }A_SalesOrderText(SalesOrder='{ is_data-salesorder }',Language='EN',LongTextID='{ iv_text_id }')|.
     rv_ok = do_call( EXPORTING iv_endpoint = endpoint iv_method = 'PATCH'
       iv_body = |\{ "LongText":"{ escape_json( iv_text ) }" \}|
       IMPORTING ev_message = ev_message ev_code = DATA(code) ev_response = DATA(response) ).
     IF rv_ok = abap_false AND code = 404.
-      DATA(body) = |\{ "SalesOrder":"{ is_data-sales_order }","Language":"EN","LongTextID":"{ iv_text_id }","LongText":"{ escape_json( iv_text ) }" \}|.
+      DATA(body) = |\{ "SalesOrder":"{ is_data-salesorder }","Language":"EN","LongTextID":"{ iv_text_id }","LongText":"{ escape_json( iv_text ) }" \}|.
       rv_ok = do_call( EXPORTING iv_endpoint = |{ c_service_root }A_SalesOrderText| iv_method = 'POST' iv_body = body
         IMPORTING ev_message = ev_message ev_code = code ev_response = response ).
     ENDIF.
@@ -101,7 +118,35 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD error_text.
-    IF iv_response IS INITIAL. rv_message = 'API returned no response'. RETURN. ENDIF.
+    IF iv_response IS INITIAL.
+      rv_message = 'API returned no response'.
+      RETURN.
+    ENDIF.
+
+    TRY.
+        DATA(flat_response) = VALUE ty_error_flat_response( ).
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_response
+          CHANGING data = flat_response ).
+        IF flat_response-error-message IS NOT INITIAL.
+          rv_message = flat_response-error-message.
+          RETURN.
+        ENDIF.
+      CATCH cx_root.
+    ENDTRY.
+
+    TRY.
+        DATA(nested_response) = VALUE ty_error_nested_response( ).
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_response
+          CHANGING data = nested_response ).
+        IF nested_response-error-message-value IS NOT INITIAL.
+          rv_message = nested_response-error-message-value.
+          RETURN.
+        ENDIF.
+      CATCH cx_root.
+    ENDTRY.
+
     rv_message = iv_response.
   ENDMETHOD.
 
