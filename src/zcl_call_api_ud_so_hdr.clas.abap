@@ -21,6 +21,8 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
     CLASS-METHODS update_header CHANGING ct_data TYPE tt_header.
   PRIVATE SECTION.
     CONSTANTS c_service_root TYPE string VALUE `/sap/opu/odata/sap/API_SALES_ORDER_SRV/`.
+    CONSTANTS c_sales_order_v4 TYPE string
+      VALUE `/sap/opu/odata4/sap/api_salesorder/srvd_a2x/sap/salesorder/0001/SalesOrder`.
     CONSTANTS c_api_name TYPE string VALUE `API_SALES_ORDER_V2`.
     CONSTANTS c_max_message TYPE i VALUE 255.
     CLASS-METHODS do_call IMPORTING iv_endpoint TYPE string iv_method TYPE string iv_body TYPE string OPTIONAL
@@ -73,7 +75,7 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD update_customer_group.
-    DATA(endpoint) = |{ c_service_root }A_SalesOrder('{ is_data-sales_order }')|.
+    DATA(endpoint) = |{ c_sales_order_v4 }('{ is_data-sales_order }')|.
     rv_ok = do_call( EXPORTING iv_endpoint = endpoint iv_method = 'PATCH'
       iv_body = |\{ "CustomerGroup":"{ escape_json( is_data-customer_group ) }" \}|
       IMPORTING ev_message = ev_message ev_code = DATA(code) ev_response = DATA(response) ).
