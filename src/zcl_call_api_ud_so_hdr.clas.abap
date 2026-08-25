@@ -20,6 +20,23 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
     TYPES tt_header TYPE STANDARD TABLE OF ty_header WITH EMPTY KEY.
     CLASS-METHODS update_header CHANGING ct_data TYPE tt_header.
   PRIVATE SECTION.
+    TYPES BEGIN OF ty_error_message.
+    TYPES value TYPE string.
+    TYPES END OF ty_error_message.
+    TYPES BEGIN OF ty_error_flat_detail.
+    TYPES code TYPE string.
+    TYPES message TYPE string.
+    TYPES END OF ty_error_flat_detail.
+    TYPES BEGIN OF ty_error_flat_response.
+    TYPES error TYPE ty_error_flat_detail.
+    TYPES END OF ty_error_flat_response.
+    TYPES BEGIN OF ty_error_nested_detail.
+    TYPES code TYPE string.
+    TYPES message TYPE ty_error_message.
+    TYPES END OF ty_error_nested_detail.
+    TYPES BEGIN OF ty_error_nested_response.
+    TYPES error TYPE ty_error_nested_detail.
+    TYPES END OF ty_error_nested_response.
     CONSTANTS c_service_root TYPE string VALUE `/sap/opu/odata/sap/API_SALES_ORDER_SRV/`.
     CONSTANTS c_sales_order_v4 TYPE string
       VALUE `/sap/opu/odata4/sap/api_salesorder/srvd_a2x/sap/salesorder/0001/SalesOrder`.
@@ -101,7 +118,35 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD error_text.
-    IF iv_response IS INITIAL. rv_message = 'API returned no response'. RETURN. ENDIF.
+    IF iv_response IS INITIAL.
+      rv_message = 'API returned no response'.
+      RETURN.
+    ENDIF.
+
+    TRY.
+        DATA(flat_response) = VALUE ty_error_flat_response( ).
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_response
+          CHANGING data = flat_response ).
+        IF flat_response-error-message IS NOT INITIAL.
+          rv_message = flat_response-error-message.
+          RETURN.
+        ENDIF.
+      CATCH cx_root.
+    ENDTRY.
+
+    TRY.
+        DATA(nested_response) = VALUE ty_error_nested_response( ).
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_response
+          CHANGING data = nested_response ).
+        IF nested_response-error-message-value IS NOT INITIAL.
+          rv_message = nested_response-error-message-value.
+          RETURN.
+        ENDIF.
+      CATCH cx_root.
+    ENDTRY.
+
     rv_message = iv_response.
   ENDMETHOD.
 
