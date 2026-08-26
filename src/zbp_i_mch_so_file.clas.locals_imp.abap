@@ -1,9 +1,29 @@
+CLASS lcl_const DEFINITION.
+  PUBLIC SECTION.
+    CONSTANTS:
+      BEGIN OF file_status,
+        open      TYPE c LENGTH 1 VALUE 'M', "Not process
+        accepted  TYPE c LENGTH 1 VALUE 'A', "Accepted
+        rejected  TYPE c LENGTH 1 VALUE 'X', "Rejected
+        completed TYPE c LENGTH 1 VALUE 'D', "Done
+        inprocess TYPE c LENGTH 1 VALUE 'P', "In process
+        error     TYPE c LENGTH 1 VALUE 'E', "Error
+        success   TYPE c LENGTH 1 VALUE 'S', "Success
+      END OF file_status,
+
+      BEGIN OF msg_type,
+        error     TYPE c LENGTH 1 VALUE 'E',
+        scheduled TYPE c LENGTH 1 VALUE 'J',
+        success   TYPE c LENGTH 1 VALUE 'S',
+      END OF msg_type.
+ENDCLASS.
+
 CLASS lhc_managefile DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
     METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
       IMPORTING REQUEST requested_authorizations FOR ManageFile RESULT result.
     METHODS uploadExcel FOR MODIFY IMPORTING keys FOR ACTION ManageFile~uploadExcel.
-    METHODS postConfirm FOR MODIFY IMPORTING keys FOR ACTION ManageFile~PostConfirm RESULT result.
+
     METHODS setStatusOpen FOR DETERMINE ON MODIFY IMPORTING keys FOR ManageFile~setStatusOpen.
     METHODS validateFile FOR VALIDATE ON SAVE IMPORTING keys FOR ManageFile~validateFile.
 ENDCLASS.
@@ -13,7 +33,6 @@ CLASS lhc_managefile IMPLEMENTATION.
     result-%create = if_abap_behv=>auth-allowed.
     result-%update = if_abap_behv=>auth-allowed.
     result-%delete = if_abap_behv=>auth-allowed.
-    result-%action-PostConfirm = if_abap_behv=>auth-allowed.
   ENDMETHOD.
 
   METHOD uploadExcel.
@@ -64,24 +83,25 @@ CLASS lhc_managefile IMPLEMENTATION.
     APPEND LINES OF create_reported-datafile TO reported-datafile.
   ENDMETHOD.
 
-  METHOD postConfirm.
-    READ ENTITIES OF zi_mch_so_file IN LOCAL MODE
-      ENTITY ManageFile BY \_DataFile ALL FIELDS WITH CORRESPONDING #( keys ) RESULT DATA(rows).
-    MODIFY ENTITIES OF zi_mch_so_file IN LOCAL MODE
-      ENTITY DataFile UPDATE FIELDS ( MessageType Message )
-      WITH VALUE #( FOR row IN rows
-        ( %tky = row-%tky MessageType = 'J' Message = `Scheduled for background processing`
-          %control-MessageType = if_abap_behv=>mk-on %control-Message = if_abap_behv=>mk-on ) )
-      FAILED failed REPORTED reported.
-    READ ENTITIES OF zi_mch_so_file IN LOCAL MODE ENTITY ManageFile
-      ALL FIELDS WITH CORRESPONDING #( keys ) RESULT DATA(files).
-    result = VALUE #( FOR file IN files ( %tky = file-%tky %param = file ) ).
-  ENDMETHOD.
 
   METHOD setStatusOpen.
-    MODIFY ENTITIES OF zi_mch_so_file IN LOCAL MODE ENTITY ManageFile
-      UPDATE FIELDS ( Status ) WITH VALUE #( FOR key IN keys
-        ( %tky = key-%tky Status = 'M' %control-Status = if_abap_behv=>mk-on ) ).
+    READ ENTITIES OF zi_mch_so_file IN LOCAL MODE
+      ENTITY ManageFile
+        FIELDS ( Status ) WITH CORRESPONDING #( keys )
+      RESULT DATA(files).
+
+    DELETE files WHERE Status IS NOT INITIAL.
+    IF files IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    MODIFY ENTITIES OF zi_mch_so_file IN LOCAL MODE
+      ENTITY ManageFile
+        UPDATE FIELDS ( Status )
+        WITH VALUE #( FOR file IN files
+          ( %tky            = file-%tky
+            Status          = lcl_const=>file_status-open
+            %control-Status = if_abap_behv=>mk-on ) ).
   ENDMETHOD.
 
   METHOD validateFile.
@@ -132,7 +152,10 @@ ENDCLASS.
 
 CLASS lhc_datafile DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
+    METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
+        IMPORTING REQUEST requested_authorizations FOR DataFile RESULT result.
     METHODS validateRow FOR VALIDATE ON SAVE IMPORTING keys FOR DataFile~validateRow.
+    METHODS postConfirm FOR MODIFY IMPORTING keys FOR ACTION DataFile~PostConfirm RESULT result.
 ENDCLASS.
 
 CLASS lhc_datafile IMPLEMENTATION.
@@ -169,4 +192,76 @@ CLASS lhc_datafile IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
+
+  METHOD postConfirm.
+    READ ENTITIES OF zi_mch_so_file IN LOCAL MODE
+      ENTITY DataFile
+        ALL FIELDS WITH CORRESPONDING #( keys )
+      RESULT DATA(rows)
+      FAILED   DATA(read_failed)
+      REPORTED DATA(read_reported).
+
+    APPEND LINES OF read_failed-datafile   TO failed-datafile.
+    APPEND LINES OF read_reported-datafile TO reported-datafile.
+
+    IF rows IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    " 1. Đánh dấu các dòng con là đã lên lịch
+    MODIFY ENTITIES OF zi_mch_so_file IN LOCAL MODE
+      ENTITY DataFile
+        UPDATE FIELDS ( MessageType Message )
+        WITH VALUE #( FOR row IN rows
+          ( %tky                 = row-%tky
+            MessageType          = lcl_const=>msg_type-scheduled
+            Message              = `Scheduled for background processing`
+            %control-MessageType = if_abap_behv=>mk-on
+            %control-Message     = if_abap_behv=>mk-on ) )
+      FAILED   DATA(update_failed)
+      REPORTED DATA(update_reported).
+
+    APPEND LINES OF update_failed-datafile   TO failed-datafile.
+    APPEND LINES OF update_reported-datafile TO reported-datafile.
+
+    " 2. Lấy key của các file cha (distinct)
+    READ ENTITIES OF zi_mch_so_file IN LOCAL MODE
+      ENTITY DataFile BY \_ManageFile
+        FROM CORRESPONDING #( keys )
+      RESULT DATA(parents).
+
+    SORT parents BY Uuid.
+    DELETE ADJACENT DUPLICATES FROM parents COMPARING Uuid.
+
+    " 3. Chuyển file cha sang In Process
+    MODIFY ENTITIES OF zi_mch_so_file IN LOCAL MODE
+      ENTITY ManageFile
+        UPDATE FIELDS ( Status )
+        WITH VALUE #( FOR p IN parents
+          ( %tky            = p-%tky
+            Status          = lcl_const=>file_status-inprocess
+            %control-Status = if_abap_behv=>mk-on ) )
+      FAILED   DATA(parent_failed)
+      REPORTED DATA(parent_reported).
+
+    APPEND LINES OF parent_failed-managefile   TO failed-managefile.
+    APPEND LINES OF parent_reported-managefile TO reported-managefile.
+
+    " 4. Trả về trạng thái sau cập nhật
+    READ ENTITIES OF zi_mch_so_file IN LOCAL MODE
+      ENTITY DataFile
+        ALL FIELDS WITH CORRESPONDING #( keys )
+      RESULT DATA(updated_rows).
+
+    result = VALUE #( FOR r IN updated_rows
+      ( %tky = r-%tky %param = r ) ).
+  ENDMETHOD.
+
+  METHOD get_global_authorizations.
+    IF requested_authorizations-%action-PostConfirm = if_abap_behv=>mk-on.
+      result-%action-PostConfirm = if_abap_behv=>auth-allowed.
+    ENDIF.
+  ENDMETHOD.
+
 ENDCLASS.

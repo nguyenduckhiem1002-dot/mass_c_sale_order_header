@@ -1,6 +1,16 @@
 {
   "formatVersion": "1",
-  "header": { "description": "Mass Change Sales Order Header Job Catalog", "originalLanguage": "en", "abapLanguageVersion": "cloudDevelopment" },
-  "generalInformation": { "className": "ZCL_JOB_MCH_SO_HEADER" },
-  "parameters": [ { "name": "HDR_ID" } ]
+  "header": {
+    "description": "Mass Change Sales Order Header Job Catalog",
+    "originalLanguage": "en",
+    "abapLanguageVersion": "cloudDevelopment"
+  },
+  "generalInformation": {
+    "className": "ZCL_JOB_MCH_SO_HEADER"
+  },
+  "parameters": [
+    {
+      "name": "HDR_ID"
+    }
+  ]
 }

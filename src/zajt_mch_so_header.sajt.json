@@ -1,6 +1,19 @@
 {
   "formatVersion": "1",
-  "header": { "description": "Mass Change Sales Order Header Application Job", "originalLanguage": "en", "abapLanguageVersion": "cloudDevelopment" },
-  "generalInformation": { "catalogName": "ZAJC_MCH_SO_HEADER" },
-  "parameters": { "valueRangesParameters": [ { "name": "HDR_ID", "valueRanges": [] } ] }
+  "header": {
+    "description": "Mass Change Sales Order Header Application Job",
+    "originalLanguage": "en",
+    "abapLanguageVersion": "cloudDevelopment"
+  },
+  "generalInformation": {
+    "catalogName": "ZAJC_MCH_SO_HEADER"
+  },
+  "parameters": {
+    "valueRangesParameters": [
+      {
+        "name": "HDR_ID",
+        "valueRanges": []
+      }
+    ]
+  }
 }

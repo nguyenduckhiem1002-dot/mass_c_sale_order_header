@@ -4,11 +4,11 @@ use draft;
 
 define behavior for ZC_MCH_SO_FILE alias ManageFile
 {
-  use create;
+  //  use create;
   use update;
   use delete;
   use action uploadExcel;
-  use action PostConfirm;
+
   use action Activate;
   use action Discard;
   use action Edit;
@@ -21,5 +21,6 @@ define behavior for ZC_MCH_SO_HDR alias DataFile
 {
   use update;
   use delete;
+  use action PostConfirm;
   use association _ManageFile { with draft; }
 }

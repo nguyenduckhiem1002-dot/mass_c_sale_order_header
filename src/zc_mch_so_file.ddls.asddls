@@ -16,5 +16,7 @@ define root view entity ZC_MCH_SO_FILE
       CreatedBy,
       CreatedAt,
       LastChangedAt,
+      LineCount,
+      SuccessCount,
       _DataFile : redirected to composition child ZC_MCH_SO_HDR
 }

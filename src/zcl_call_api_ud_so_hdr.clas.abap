@@ -6,7 +6,7 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
     TYPES SalesOrder TYPE c LENGTH 10.
     TYPES CustomerGroup TYPE c LENGTH 2.
     TYPES LcNumber TYPE string.
-    TYPES LcOpenDate TYPE d.
+    TYPES LcOpenDate TYPE string.
     TYPES CommissionRate TYPE string.
     TYPES ExportTrustContract TYPE string.
     TYPES HasCustomerGroup TYPE abap_boolean.
@@ -19,6 +19,7 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
     TYPES END OF ty_header.
     TYPES tt_header TYPE STANDARD TABLE OF ty_header WITH EMPTY KEY.
     CLASS-METHODS update_header CHANGING ct_data TYPE tt_header.
+  PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES BEGIN OF ty_error_message.
     TYPES value TYPE string.
@@ -52,7 +53,11 @@ CLASS zcl_call_api_ud_so_hdr DEFINITION PUBLIC FINAL CREATE PUBLIC.
     CLASS-METHODS escape_json IMPORTING iv_text TYPE string RETURNING VALUE(rv_text) TYPE string.
 ENDCLASS.
 
+
+
 CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
+
+
   METHOD update_header.
     LOOP AT ct_data ASSIGNING FIELD-SYMBOL(<row>).
       DATA errors TYPE string_table.
@@ -68,7 +73,7 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
       ENDIF.
       IF <row>-haslcopendate = abap_true.
         update_header_text( EXPORTING is_data = <row> iv_text_id = 'Z014'
-          iv_text = |{ <row>-lcopendate DATE = ISO }| IMPORTING ev_message = message RECEIVING rv_ok = ok ).
+          iv_text = |{ <row>-lcopendate }| IMPORTING ev_message = message RECEIVING rv_ok = ok ).
         IF ok = abap_false. APPEND |Ngày mở LC: { message }| TO errors. ENDIF.
       ENDIF.
       IF <row>-hascommissionrate = abap_true.
@@ -91,18 +96,24 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
     ENDLOOP.
   ENDMETHOD.
 
+
   METHOD update_customer_group.
+    DATA: code     TYPE i,
+          response TYPE string.
     DATA(endpoint) = |{ c_sales_order_v4 }('{ is_data-salesorder }')|.
     rv_ok = do_call( EXPORTING iv_endpoint = endpoint iv_method = 'PATCH'
       iv_body = |\{ "CustomerGroup":"{ escape_json( CONV string( is_data-customergroup ) ) }" \}|
-      IMPORTING ev_message = ev_message ev_code = DATA(code) ev_response = DATA(response) ).
+      IMPORTING ev_message = ev_message ev_code = code ev_response = response ).
   ENDMETHOD.
 
+
   METHOD update_header_text.
+    DATA: code     TYPE i,
+          response TYPE string.
     DATA(endpoint) = |{ c_service_root }A_SalesOrderText(SalesOrder='{ is_data-salesorder }',Language='EN',LongTextID='{ iv_text_id }')|.
     rv_ok = do_call( EXPORTING iv_endpoint = endpoint iv_method = 'PATCH'
       iv_body = |\{ "LongText":"{ escape_json( iv_text ) }" \}|
-      IMPORTING ev_message = ev_message ev_code = DATA(code) ev_response = DATA(response) ).
+      IMPORTING ev_message = ev_message ev_code = code ev_response = response ).
     IF rv_ok = abap_false AND code = 404.
       DATA(body) = |\{ "SalesOrder":"{ is_data-salesorder }","Language":"EN","LongTextID":"{ iv_text_id }","LongText":"{ escape_json( iv_text ) }" \}|.
       rv_ok = do_call( EXPORTING iv_endpoint = |{ c_service_root }A_SalesOrderText| iv_method = 'POST' iv_body = body
@@ -110,12 +121,14 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD do_call.
     ev_response = zcl_call_api=>call_api( iv_body = iv_body iv_endpoint = iv_endpoint iv_apiName = c_api_name iv_method = iv_method ).
     ev_code = zcl_call_api=>code.
     rv_ok = xsdbool( ev_code = 200 OR ev_code = 201 OR ev_code = 204 ).
     IF rv_ok = abap_false. ev_message = error_text( ev_response ). ENDIF.
   ENDMETHOD.
+
 
   METHOD error_text.
     IF iv_response IS INITIAL.
@@ -149,6 +162,7 @@ CLASS zcl_call_api_ud_so_hdr IMPLEMENTATION.
 
     rv_message = iv_response.
   ENDMETHOD.
+
 
   METHOD escape_json.
     rv_text = iv_text.

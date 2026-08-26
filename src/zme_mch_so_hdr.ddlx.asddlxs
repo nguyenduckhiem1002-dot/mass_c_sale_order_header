@@ -14,6 +14,14 @@ annotate entity ZC_MCH_SO_HDR with
     { id: 'Result', parentId: 'General', type: #FIELDGROUP_REFERENCE,
       targetQualifier: 'Result', label: 'Processing Result', position: 20 }
   ]
+
+
+  @UI.lineItem: [
+           { label: 'Post Document',
+             dataAction: 'PostConfirm',
+             type: #FOR_ACTION,
+             invocationGrouping: #CHANGE_SET
+           }]
   @UI.hidden: true
   Uuid;
 

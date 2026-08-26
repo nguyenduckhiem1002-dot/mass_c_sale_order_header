@@ -14,10 +14,11 @@ authorization master ( global )
   update;
   delete;
   field ( readonly, numbering : managed ) Uuid;
-  field ( readonly ) Attachment, CreatedBy, CreatedAt, LastChangedAt;
+  field ( readonly ) Attachment, CreatedBy, CreatedAt, LastChangedAt, LineCount, SuccessCount;
+  field ( readonly: update ) FileName;
   association _DataFile { with draft; create; }
   static action uploadExcel parameter zabs_file_crud_poc;
-  action PostConfirm result [1] $self;
+
   draft action Activate optimized;
   draft action Discard;
   draft action Edit;
@@ -26,22 +27,22 @@ authorization master ( global )
   determination setStatusOpen on modify { create; }
   validation validateFile on save { create; update; }
   mapping for ztb_mch_so_file
-  {
-    Uuid = uuid;
-    FileName = file_name;
-    FileMimeType = file_mime_type;
-    Attachment = attachment;
-    Status = status;
-    Message = message;
-    CreatedBy = created_by;
-    CreatedAt = created_at;
-    LastChangedAt = last_changed_at;
-  }
+    {
+      Uuid          = uuid;
+      FileName      = file_name;
+      FileMimeType  = file_mime_type;
+      Attachment    = attachment;
+      Status        = status;
+      Message       = message;
+      CreatedBy     = created_by;
+      CreatedAt     = created_at;
+      LastChangedAt = last_changed_at;
+    }
 }
 
 define behavior for ZI_MCH_SO_HDR alias DataFile
 persistent table ztb_mch_so_hdr
-draft table ztbd_mch_so_up_d
+draft table ztb_mch_so_hdr_d
 lock dependent by _ManageFile
 authorization dependent by _ManageFile
 with additional save
@@ -50,29 +51,30 @@ with additional save
   delete;
   association _ManageFile { with draft; }
   field ( readonly, numbering : managed ) Uuid;
-  field ( readonly ) UuidFile, MessageType, Message, CreatedBy, CreatedAt, LastChangedBy, LastChangedAt;
+  field ( readonly ) UuidFile, CreatedBy, CreatedAt, LastChangedBy, LastChangedAt;
   field ( mandatory ) SalesOrder;
+  action PostConfirm result [1] $self;
   validation validateRow on save { create; update; field SalesOrder; }
   mapping for ztb_mch_so_hdr
-  {
-    Uuid = uuid;
-    UuidFile = uuid_file;
-    SalesOrder = sales_order;
-    CustomerGroup = customer_group;
-    LcNumber = lc_number;
-    LcOpenDate = lc_open_date;
-    CommissionRate = commission_rate;
-    ExportTrustContract = export_trust_contract;
-    HasCustomerGroup = has_customer_group;
-    HasLcNumber = has_lc_number;
-    HasLcOpenDate = has_lc_open_date;
-    HasCommissionRate = has_commission_rate;
-    HasExportTrustContract = has_export_trust_contract;
-    MessageType = message_type;
-    Message = message;
-    CreatedBy = created_by;
-    CreatedAt = created_at;
-    LastChangedBy = last_changed_by;
-    LastChangedAt = last_changed_at;
-  }
+    {
+      Uuid                   = uuid;
+      UuidFile               = uuid_file;
+      SalesOrder             = sales_order;
+      CustomerGroup          = customer_group;
+      LcNumber               = lc_number;
+      LcOpenDate             = lc_open_date;
+      CommissionRate         = commission_rate;
+      ExportTrustContract    = export_trust_contract;
+      HasCustomerGroup       = has_customer_group;
+      HasLcNumber            = has_lc_number;
+      HasLcOpenDate          = has_lc_open_date;
+      HasCommissionRate      = has_commission_rate;
+      HasExportTrustContract = has_export_trust_contract;
+      MessageType            = message_type;
+      Message                = message;
+      CreatedBy              = created_by;
+      CreatedAt              = created_at;
+      LastChangedBy          = last_changed_by;
+      LastChangedAt          = last_changed_at;
+    }
 }
